@@ -1,35 +1,46 @@
 <!DOCTYPE html>
 <html lang="ja">
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-８">
+        <meta name="viewport" content="width=device-width, initial-scale=１.０">
         <title>こども園 チーム役割診断</title>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css２?family=Noto+Sans+JP:wght@４００;７００&family=Noto+Serif+JP:wght@７００&display=swap" rel="stylesheet">
         <style>
-            :root { --green-deep: #2d5a3d; --green-light: #e8f2ec; --accent: #c8763a; --text: #1a2e22; }
-            body { font-family: 'Noto Sans JP', sans-serif; background-color: #faf8f3; color: var(--text); padding: 20px; margin: 0; }
-            .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-            h1 { font-family: 'Noto Serif JP', serif; color: var(--green-deep); text-align: center; font-size: ２４px; }
-            .intro { font-size: １４px; text-align: center; margin-bottom: ３０px; color: #666; }
+            :root { --green-deep: #２d５a３d; --green-light: #e８f２ec; --accent: #c８７６３a; --text: #１a２e２２; }
+            body { font-family: 'Noto Sans JP', sans-serif; background-color: #faf８f３; color: var(--text); padding: ２０px; margin: ０; line-height: １.６; }
+            .container { max-width: ６００px; margin: ０ auto; background: #fff; padding: ３０px; border-radius: ２０px; box-shadow: ０ ４px ２０px rgba(０,０,０,０.０５); }
+            h１ { font-family: 'Noto Serif JP', serif; color: var(--green-deep); text-align: center; font-size: ２４px; margin-top: ０; }
+            .intro { font-size: １４px; text-align: center; margin-bottom: ３０px; color: #６６６; }
             .question-item { margin-bottom: ２５px; padding-bottom: ２０px; border-bottom: １px dashed #eee; }
             .question-text { font-weight: bold; font-size: １５px; margin-bottom: １２px; display: block; }
             .options { display: flex; justify-content: space-between; gap: ８px; }
             .option-label { flex: １; text-align: center; font-size: １１px; cursor: pointer; }
             .option-label input { display: none; }
-            .radio-button { display: block; padding: １２px ５px; background: #f0f0f0; border-radius: ８px; margin-bottom: ５px; transition: ０.２s; font-weight: bold; }
+            .radio-button { display: block; padding: １２px ５px; background: #f０f０f０; border-radius: ８px; margin-bottom: ５px; transition: ０.２s; font-weight: bold; }
             input:checked + .radio-button { background: var(--green-deep); color: #fff; }
             .btn-submit { display: block; width: １００%; padding: １８px; background: var(--green-deep); color: #fff; border: none; border-radius: １０px; font-size: １６px; font-weight: bold; cursor: pointer; margin-top: ２０px; }
             
-            #error-msg { display: none; background: #fff0f0; color: #d00; padding: １５px; border-radius: １０px; margin-top: １５px; font-size: １４px; border: １px solid #ffcccc; text-align: center; line-height: １.５; }
+            #error-msg { display: none; background: #fff０f０; color: #d００; padding: １５px; border-radius: １０px; margin-top: １５px; font-size: １４px; border: １px solid #ffcccc; text-align: center; }
             #result-area { display: none; text-align: center; }
             
-            #res-illust { width: １００%; max-width: ３００px; height: auto; margin: ２０px auto; border-radius: １５px; border: ２px solid var(--green-light); box-shadow: ０ ２px １０px rgba(０,０,０,０.０５); display: block; }
-            .main-attribute { font-family: 'Noto Serif JP', serif; font-size: ２８px; color: var(--accent); margin-bottom: ２０px; }
-            .description { text-align: left; background: var(--green-light); padding: ２０px; border-radius: １５px; font-size: １４px; margin-bottom: ２０px; line-height: １.６; }
+            /* 画像表示：自前の画像を上品に表示 */
+            #res-illust { 
+                width: １００%; 
+                max-width: ３００px; 
+                height: auto; 
+                margin: ２０px auto; 
+                border-radius: １５px; 
+                border: ２px solid var(--green-light); 
+                box-shadow: ０ ２px １０px rgba(０,０,０,０.０５); 
+                display: block; 
+            }
             
-            /* 進化のポイント用スタイル */
-            .evolution-box { text-align: left; border: ２px solid var(--accent); padding: ２０px; border-radius: １５px; margin-top: ２０px; background: #fff; }
+            .main-attribute { font-family: 'Noto Serif JP', serif; font-size: ２８px; color: var(--accent); margin-bottom: ２０px; }
+            .description { text-align: left; background: var(--green-light); padding: ２０px; border-radius: １５px; font-size: １４px; margin-bottom: ２０px; }
+            
+            /* 進化のポイント枠 */
+            .evolution-box { text-align: left; border: ２px solid var(--accent); padding: ２０px; border-radius: １５px; margin-top: ２０px; background: #fff; font-size: １４px; }
             .evolution-title { font-weight: bold; color: var(--accent); margin-bottom: １０px; border-bottom: １px solid var(--accent); padding-bottom: ５px; display: inline-block; }
         </style>
     </head>
@@ -51,15 +62,15 @@
                 <div class="result-title">あなたは</div>
                 <div id="res-name" class="main-attribute"></div>
                 <div id="res-desc" class="description"></div>
-                
                 <div id="res-evolution" class="evolution-box"></div>
                 
-                <canvas id="radarChart" style="margin-top:３０px;"></canvas>
-                <button type="button" class="btn-submit" style="background:#666;" onclick="location.reload()">もう一度診断する</button>
+                <canvas id="radarChart" style="margin-top: ３０px;"></canvas>
+                <button type="button" class="btn-submit" style="background: #６６６;" onclick="location.reload()">もう一度診断する</button>
             </div>
         </div>
         
         <script>
+            // 質問リスト（全１５問）
             const questions = [
             { id: １, type: "土", text: "園の伝統や、地域行事などの「季節のしきたり」を大切に継承したい。" },
             { id: ２, type: "風", text: "「今の保育環境でいいのかな？」と、新しい遊びや環境構成を常に提案したい。" },
@@ -78,13 +89,20 @@
             { id: １５, type: "水", text: "自分が主役で目立つよりも、子どもや同僚が輝けるように裏方で環境を整えるのが好きだ。" }
             ];
             
+            // 質問の生成
             const container = document.getElementById('questions-container');
             questions.forEach((q, i) => {
                     container.insertAdjacentHTML('beforeend', `
                         <div class="question-item">
                         <span class="question-text">${i+１}. ${q.text}</span>
                         <div class="options">
-                        ${[４,３,２,１].map(v => `<label class="option-label"><input type="radio" name="q${q.id}" value="${v}"><span class="radio-button">${v}</span>${v===４?'非常に':v===１?'全く':''}</label>`).join('')}
+                        ${[４,３,２,１].map(v => `
+                                <label class="option-label">
+                                <input type="radio" name="q${q.id}" value="${v}">
+                                <span class="radio-button">${v}</span>
+                                ${v===４?'非常に':v===１?'全く':''}
+                                </label>
+                        `).join('')}
                         </div>
                         </div>
                     `);
@@ -94,7 +112,11 @@
                 const data = new FormData(document.getElementById('diag-form'));
                 const errorMsg = document.getElementById('error-msg');
                 let missed = [];
-                questions.forEach((q, i) => { if (!data.get(`q${q.id}`)) missed.push(i + １); });
+                
+                // 未回答チェック
+                questions.forEach((q, i) => {
+                        if (!data.get(`q${q.id}`)) missed.push(i + １);
+                });
                 
                 if (missed.length > ０) {
                     errorMsg.style.display = 'block';
@@ -113,6 +135,7 @@
                 
                 let m = Object.keys(s).reduce((a, b) => s[a] > s[b] ? a : b);
                 
+                // 画像ファイルの指定（リポジトリ内のファイル名に合わせてください）
                 const resImages = { "土": "tsuchi.jpg", "風": "kaze.jpg", "水": "mizu.jpg" };
                 document.getElementById('res-illust').src = resImages[m];
                 
@@ -123,17 +146,17 @@
                     "水": "チームの「笑顔」を守る潤滑油です。あなたが対話を繋ぎ、空気を循環させることで、職員が互いに助け合える温かい職場になります。" 
                 };
                 
-                // ✅ こども園向け「進化のポイント」
                 const evolutions = {
-                    "土": "<span class='evolution-title'>✨ さらに進化するためのポイント</span><br>時には園の外へ飛び出して、他園の視察や研究会に「一人の見学者」として参加してみませんか？外からの視点を体験することで、「新しい風を入れようとする仲間の気持ち」がより深く理解できるようになり、あなたの持つ「受け入れの器」がさらに大きく、温かいものへと広がります。",
-                    "風": "<span class='evolution-title'>✨ さらに進化するためのポイント</span><br>新しいアイデアを提案する前に、まずは園がこれまで大切に繋いできた「物語」にゆっくりと耳を傾けてみましょう。園の歴史を丸ごと尊重した上で提案をすることで、周囲の安心感が増し、みんなと一緒にワクワクする変化を導ける「聞き上手な変革者」へと進化できます。",
-                    "水": "<span class='evolution-title'>✨ さらに進化するためのポイント</span><br>みんなの調整役に留まらず、ときには自分から「これをやってみたい！」と小さなプロジェクトのリーダーを引き受けてみませんか？「いい人」から一歩進んで、自ら実践し形にする経験を重ねることで、自分自身の自信に繋がり、チームをより力強く支えられる「頼れる実践家」へと脱皮できます。"
+                    "土": "<span class='evolution-title'>✨ さらに進化するためのポイント</span><br>時には園の外へ飛び出して、他園の視察や研究会に「一人の見学者」として参加してみませんか？外からの視点を体験することで、『新しい風を入れようとする仲間の気持ち』がより深く理解できるようになり、あなたの持つ「受け入れの器」がさらに大きく、温かいものへと広がります。",
+                    "風": "<span class='evolution-title'>✨ さらに進化するためのポイント</span><br>新しいアイデアを提案する前に、まずは園がこれまで大切に繋いできた「物語」にゆっくりと耳を傾けてみましょう。園の歴史を丸ごと尊重した上で提案をすることで、周囲の安心感が増し、みんなと一緒にワクワクする変化を導ける『聞き上手な変革者』へと進化できます。",
+                    "水": "<span class='evolution-title'>✨ さらに進化するためのポイント</span><br>みんなの調整役に留わらず、ときには自分から「これをやってみたい！」と小さなプロジェクトのリーダーを引き受けてみませんか？『いい人』から一歩進んで、自ら実践し形にする経験を重ねることで、自分自身の自信に繋がり、チームをより力強く支えられる『頼れる実践家』へと脱皮できます。"
                 };
                 
                 document.getElementById('res-name').innerText = names[m];
                 document.getElementById('res-desc').innerText = descs[m];
                 document.getElementById('res-evolution').innerHTML = evolutions[m];
                 
+                // レーダーチャート
                 new Chart(document.getElementById('radarChart'), { 
                         type: 'radar', 
                         data: { 
@@ -146,7 +169,10 @@
                                 pointBackgroundColor: 'rgb(２００, １１８, ５８)'
                             }] 
                         }, 
-                        options: { scales: { r: { min: ０, max: ２０, ticks: { display: false } } } } 
+                        options: { 
+                            scales: { r: { min: ０, max: ２０, ticks: { display: false }, pointLabels: { font: { size: １４ } } } },
+                            plugins: { legend: { display: false } }
+                        } 
                 });
                 window.scrollTo(０,０);
             }
