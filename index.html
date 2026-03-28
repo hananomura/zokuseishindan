@@ -26,6 +26,7 @@
         .main-attribute { font-family: 'Noto Serif JP', serif; font-size: 28px; color: var(--accent); margin-bottom: 20px; }
         .description { text-align: left; background: var(--green-light); padding: 20px; border-radius: 15px; font-size: 14px; margin-bottom: 20px; }
         .evolution-box { text-align: left; border: 2px solid var(--accent); padding: 20px; border-radius: 15px; margin-top: 20px; background: #fff; font-size: 14px; }
+        .chart-container { width: 100%; max-width: 350px; margin: 30px auto; }
     </style>
 </head>
 <body>
@@ -48,7 +49,9 @@
         <div id="res-evolution" class="evolution-box"></div>
         
         <p style="margin-top: 30px; font-weight: bold; color: var(--green-deep);">【 あなたの属性バランス 】</p>
-        <canvas id="radarChart"></canvas>
+        <div class="chart-container">
+            <canvas id="pieChart"></canvas>
+        </div>
         
         <button type="button" class="btn-submit" style="background: #666;" onclick="location.reload()">もう一度診断する</button>
     </div>
@@ -94,7 +97,7 @@ function calc() {
     questions.forEach(q => { s[q.type] += parseInt(data.get(`q${q.id}`) || 0); });
 
     const total = s["水"] + s["土"] + s["風"];
-    if (total === 0) return; // 全く選択されていない場合は何もしない
+    if (total === 0) return;
 
     const p = {
         "水": Math.round((s["水"] / total) * 100),
@@ -123,27 +126,32 @@ function calc() {
         "水": "<b style='color:var(--accent)'>✨ さらに進化するためのポイント</b><br>みんなの調整役に留まらず、ときには自分から「これをやってみたい！」と小さなプロジェクトのリーダーを引き受けてみませんか？『いい人』から一歩進んで、自ら実践し形にする経験を重ねることで、自分自身の自信に繋がり、チームをより力強く支えられるようになります。"
     }[m];
 
-    new Chart(document.getElementById('radarChart'), { 
-        type: 'radar', 
+    // 円グラフの作成
+    new Chart(document.getElementById('pieChart'), { 
+        type: 'pie', 
         data: { 
             labels: [`水 (${p["水"]}%)`, `土 (${p["土"]}%)`, `風 (${p["風"]}%)`], 
             datasets: [{ 
                 data: [p["水"], p["土"], p["風"]], 
-                backgroundColor: 'rgba(200, 118, 58, 0.2)', 
-                borderColor: 'rgb(200, 118, 58)',
+                backgroundColor: [
+                    '#7fb3d5', // 水：落ち着いた青
+                    '#2d5a3d', // 土：深緑
+                    '#c8763a'  // 風：アクセントカラー（オレンジ）
+                ],
+                borderWidth: 2,
+                borderColor: '#ffffff'
             }] 
         }, 
         options: { 
-            scales: { 
-                r: { 
-                    min: 0, 
-                    max: 60, 
-                    ticks: { display: false },
-                    pointLabels: { font: { size: 14, weight: 'bold' } }
-                } 
-            }, 
-            plugins: { legend: { display: false } } 
-        }
+            responsive: true,
+            plugins: { 
+                legend: { 
+                    position: 'bottom',
+                    labels: { font: { size: 14, weight: 'bold' }, padding: 20 }
+                },
+                tooltip: { enabled: true }
+            }
+        } 
     });
     window.scrollTo(0,0);
 }
