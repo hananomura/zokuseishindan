@@ -26,6 +26,7 @@
         .res-type-main { font-family: 'Noto Serif JP', serif; font-size: 42px; color: var(--green-deep); margin-bottom: 10px; border-bottom: 2px solid var(--green-light); display: inline-block; padding: 0 20px; }
         .main-attribute { font-family: 'Noto Serif JP', serif; font-size: 28px; color: var(--accent); margin-bottom: 20px; }
         .description { text-align: left; background: var(--green-light); padding: 20px; border-radius: 15px; font-size: 14px; margin-bottom: 20px; }
+        .warning-box { text-align: left; background: #fff5f5; border: 1px solid #ffcccc; padding: 15px; border-radius: 10px; font-size: 13px; margin-bottom: 20px; color: #883333; }
         .evolution-box { text-align: left; border: 2px solid var(--accent); padding: 20px; border-radius: 15px; margin-top: 20px; background: #fff; font-size: 14px; }
         .chart-container { width: 100%; max-width: 380px; margin: 30px auto; }
     </style>
@@ -34,7 +35,10 @@
 <div class="container">
     <div id="survey-area">
         <h1>こども園 チーム役割診断</h1>
-        <p class="intro">最も近いものを選んでください。直感で選ぶのがポイントです。</p>
+        <p class="intro">
+            今の自分にどの程度当てはまるか、直感でお答えください。<br>
+            ※ここでの「罠（弱点）」は、あなたが一生懸命だからこそ現れる頑張りのサインです。
+        </p>
         <form id="diag-form">
             <div id="questions-container"></div>
             <button type="button" class="btn-submit" onclick="validateAndCalc()">結果を見る</button>
@@ -47,6 +51,7 @@
         <div id="res-type" class="res-type-main"></div>
         <div id="res-name" class="main-attribute"></div>
         <div id="res-desc" class="description"></div>
+        <div id="res-warning" class="warning-box"></div>
         <div id="res-evolution" class="evolution-box"></div>
         
         <p style="margin-top: 30px; font-weight: bold; color: var(--green-deep);">【 あなたの属性バランス 】</p>
@@ -59,7 +64,6 @@
 </div>
 
 <script>
-// 数字を全角にする
 function toFullWidth(str) {
     return str.toString().replace(/[0-9]/g, function(s) {
         return String.fromCharCode(s.charCodeAt(0) + 0xFEE0);
@@ -67,21 +71,21 @@ function toFullWidth(str) {
 }
 
 const questions = [
-    { id: 1, type: "土", text: "園でずっと続けてきた行事も、「もっと子どもたちが楽しめるには？」と中身をアップデートさせるのが好き。" },
-    { id: 2, type: "風", text: "素敵な取り組みを見つけたとき、そのまま持ち込むのではなく「うちの園に合う言葉や形」に変えてみんなに伝えたい。" },
-    { id: 3, type: "水", text: "意見が分かれたとき、両方の話を聞くだけでなく「こうしたらみんなが納得して前に進めるかも」と自分の案を出してみたい。" },
-    { id: 4, type: "土", text: "毎日の掃除や準備を、ただこなすだけでなく「どうすればもっとみんなが楽にできるか」を工夫したい。" },
-    { id: 5, type: "風", text: "新しいやり方を提案する前に、まずは現場の先生たちが大切にしてきた「想い」をしっかり聴くようにしている。" },
-    { id: 6, type: "水", text: "困っている仲間を助けるときは、ただ手伝うだけでなく、その人が次から自信を持って動けるような「環境」を整えてあげたい。" },
-    { id: 7, type: "土", text: "新しいことに挑戦しようとする仲間がいたら、園のルールと照らし合わせて、安心して動けるように支えてあげたい。" },
-    { id: 8, type: "風", text: "「今のやり方を変えた方がいい」と思ったときは、反対されるのを怖がらずに、その理由を丁寧に周りへ話したい。" },
-    { id: 9, type: "水", text: "周りに合わせるだけでなく、自分が「これだ！」と信じることがあれば、自ら手を挙げて責任ある役割を引き受けたい。" },
-    { id: 10, type: "土", text: "外の新しいやり方を聞いたとき、「うちは無理」と決めつけず「うちの園ならどう取り入れられるか」をまず考えたい。" },
-    { id: 11, type: "風", text: "自分のアイデアをただの思いつきで終わらせず、本で調べたり外の人に聞いたりして、形になるまで粘り強く動きたい。" },
-    { id: 12, type: "水", text: "相談に乗るだけでなく、自分自身が現場で一番「楽しんで実践する姿」を見せることで、チームを勇気づけたい。" },
-    { id: 13, type: "土", text: "これまでの経験を活かして、新しいアイデアを形にするための「具体的な段取り」を整えるのが自分の役割だと思う。" },
-    { id: 14, type: "風", text: "「いいな！」と思ったことがその場限りにならないよう、園の「当たり前」として定着するまで見守り続けたい。" },
-    { id: 15, type: "水", text: "チームの笑顔を守るために、なあなあにするのではなく、時には「みんなの未来のために必要なこと」を優しく、誠実に伝えたい。" }
+    { id: 1, type: "土", text: "園の伝統や日々のルーチンを大切に守り、子どもや保護者に「いつも通りの安心」を届けることにやりがいを感じる。" },
+    { id: 2, type: "風", text: "園の外で学んだことや最新の情報を持ち込んで、チームに新しいワクワクや変化のきっかけを作る役割でありたい。" },
+    { id: 3, type: "水", text: "意見が分かれたとき、両方の話を丁寧に聞いて、お互いが納得できるような「言葉の翻訳」や調整をするのが自分の役目だ。" },
+    { id: 4, type: "土", text: "周囲から「あなたなら任せられる」と信頼され、これまでの積み重ねを認められることが一番の原動力になる。" },
+    { id: 5, type: "風", text: "自分の得意分野や専門スキルを活かして、これまでの園にはなかった「新しい組み合わせ」の遊びや仕組みを提案したい。" },
+    { id: 6, type: "水", text: "相手の気持ちに寄り添って話を聴き、バラバラだった関係を繋ぎ直して、チームの空気を循環させることに長けている。" },
+    { id: 7, type: "土", text: "新しいアイデアが出たとき、今の園のルールや過去の経験を活かして、どうすれば安全に実現できるかを考えるのが得意だ。" },
+    { id: 8, type: "風", text: "しがらみにとらわれず、「もっとこうすれば良くなるのに！」という自由な視点で意見を出すことに自信がある。" },
+    { id: 9, type: "水", text: "自分が主役になるよりも、みんなが動きやすいように裏方で環境を整え、スムーズに物事が進むプロセスを作るのが好きだ。" },
+    { id: 10, type: "土", text: "正直なところ、新しいやり方を次々と持ち込まれるよりも、慣れた手順で進めるほうがミスがなく安心だと感じる。" },
+    { id: 11, type: "風", text: "園の中の「当たり前」に対して、「なぜもっと新しく変えないんだろう？」ともどかしく感じ、つい正論を押し通したくなる。" },
+    { id: 12, type: "水", text: "誰かのフォローや調整に回ることが多く、気づくと自分の仕事が後回しになって、心身ともに疲れを感じることが多い。" },
+    { id: 13, type: "土", text: "他園の成功事例を聞いても、「うちは環境が違うから、そのままでは上手くいかない」と慎重になりすぎてしまうことがある。" },
+    { id: 14, type: "風", text: "良いアイデアを思いつくと、周りの先生たちの忙しさやこれまでの背景を考える前に、一人で突っ走ってしまうことがある。" },
+    { id: 15, type: "水", text: "チームの和を乱したくないという思いから、自分の本当の意見を飲み込んで、つい自己犠牲的に周りに合わせてしまう。" }
 ];
 
 const container = document.getElementById('questions-container');
@@ -99,18 +103,10 @@ questions.forEach((q, i) => {
     `);
 });
 
-// ✅ アラートを出すためのバリデーション関数
 function validateAndCalc() {
-    const form = document.getElementById('diag-form');
-    const data = new FormData(form);
+    const data = new FormData(document.getElementById('diag-form'));
     let unanswered = [];
-
-    questions.forEach(q => {
-        if (!data.get(`q${q.id}`)) {
-            unanswered.push(toFullWidth(questions.indexOf(q) + 1));
-        }
-    });
-
+    questions.forEach(q => { if (!data.get(`q${q.id}`)) unanswered.push(toFullWidth(questions.indexOf(q) + 1)); });
     if (unanswered.length > 0) {
         alert("未回答の項目があります： " + unanswered.join("、 ") + " 番");
         const firstUnanswered = questions.find(q => !data.get(`q${q.id}`));
@@ -124,11 +120,7 @@ function calc(data) {
     let s = { "水": 0, "土": 0, "風": 0 };
     questions.forEach(q => { s[q.type] += parseInt(data.get(`q${q.id}`)); });
     const total = s["水"] + s["土"] + s["風"];
-    const p = {
-        "水": Math.round((s["水"] / total) * 100),
-        "土": Math.round((s["土"] / total) * 100),
-        "風": Math.round((s["風"] / total) * 100)
-    };
+    const p = { "水": Math.round((s["水"]/total)*100), "土": Math.round((s["土"]/total)*100), "風": Math.round((s["風"]/total)*100) };
 
     document.getElementById('survey-area').style.display = 'none';
     document.getElementById('result-area').style.display = 'block';
@@ -145,18 +137,21 @@ function calc(data) {
         "風": "保育に「ワクワク」を呼び込む開拓者です。あなたの好奇心が、園の環境をアップデートし、子どもたちの新しい世界を広げます。", 
         "水": "チームの「笑顔」を守る潤滑油です。あなたが対話を繋ぎ、空気を循環させることで、職員が互いに助け合える温かい職場になります。" 
     }[m];
-    document.getElementById('res-evolution').innerHTML = {
-        "土": "<b style='color:var(--accent)'>✨ さらに進化するためのポイント</b><br>時には園の外へ飛び出して、他園の視察や研究会に「一人の見学者」として参加してみませんか？外からの視点を体験することで、『新しい風を入れようとする仲間の気持ち』がより深く理解できるようになり、あなたの持つ「受け入れの器」がさらに大きく広がります。",
-        "風": "<b style='color:var(--accent)'>✨ さらに進化するためのポイント</b><br>新しいアイデアを提案する前に、まずは園がこれまで大切に繋いできた「物語」にゆっくりと耳を傾けてみましょう。園の歴史を丸ごと尊重した上で提案をすることで、周囲の安心感が増し、みんなと一緒にワクワクする変化を導けるようになります。",
-        "水": "<b style='color:var(--accent)'>✨ さらに進化するためのポイント</b><br>みんなの調整役に留まらず、ときには自分から「これをやってみたい！」と小さなプロジェクトのリーダーを引き受けてみませんか？『いい人』から一歩進んで、自ら実践し形にする経験を重ねることで、自分自身の自信に繋がり、チームをより力強く支えられるようになります。"
+
+    document.getElementById('res-warning').innerHTML = {
+        "土": "<b>⚠️ つい陥りやすい状態：</b> 園の伝統を大切にするあまり、新しい提案に対して無意識に「うちは違うから」とシャッターを下ろしてしまうことも。変化を遠ざけすぎると、園の良さが今の時代とズレてしまうかもしれません。",
+        "風": "<b>⚠️ つい陥りやすい状態：</b> 「これが正解だ！」という思いが強すぎて、園の背景や他の先生たちの苦労を置き去りにしてしまうことも。周囲を置いてけぼりにすると、せっかくのアイデアも形にならなくなってしまいます。",
+        "水": "<b>⚠️ つい陥りやすい状態：</b> 全員の顔色を伺い、自分さえ我慢すれば…と考えがちです。自分の意見を後回しにし続けると、ある日突然エネルギーが切れて、燃え尽きてしまうかもしれません。"
     }[m];
 
-    const sortedData = [
-        { label: "水", value: p["水"], color: '#7fb3d5' },
-        { label: "土", value: p["土"], color: '#2d5a3d' },
-        { label: "風", value: p["風"], color: '#c8763a' }
-    ].sort((a, b) => b.value - a.value);
+    document.getElementById('res-evolution').innerHTML = {
+        "土": "<b style='color:var(--accent)'>✨ さらに進化するためのポイント</b><br>時には園の外へ飛び出して、他園の視察に「一人の見学者」として参加してみませんか？外の視点を体験することで、新しい風を入れようとする仲間の気持ちがより深く理解でき、あなたの「受け入れの器」がさらに大きく広がります。",
+        "風": "<b style='color:var(--accent)'>✨ さらに進化するためのポイント</b><br>新しいアイデアを提案する前に、まずは園が大切にしてきた「物語」に耳を傾けてみましょう。園の歴史を尊重した上で提案をすることで、周囲の安心感が増し、みんなと一緒にワクワクする変化を導けるようになります。",
+        "水": "<b style='color:var(--accent)'>✨ さらに進化するためのポイント</b><br>調整役に留まらず、ときには自分からプロジェクトのリーダーを引き受けてみませんか？「いい人」から一歩進んで、自ら実践し形にする経験を重ねることで、自信に繋がり、チームをより力強く支えられるようになります。"
+    }[m];
 
+    const sortedData = [{ label: "水", value: p["水"], color: '#7fb3d5' },{ label: "土", value: p["土"], color: '#2d5a3d' },{ label: "風", value: p["風"], color: '#c8763a' }].sort((a,b) => b.value - a.value);
+    
     Chart.register(ChartDataLabels);
     new Chart(document.getElementById('pieChart'), { 
         type: 'pie', 
@@ -164,25 +159,23 @@ function calc(data) {
             labels: sortedData.map(d => d.label), 
             datasets: [{ 
                 data: sortedData.map(d => d.value), 
-                backgroundColor: sortedData.map(d => d.color),
-                borderWidth: 2,
-                borderColor: '#ffffff'
+                backgroundColor: sortedData.map(d => d.color), 
+                borderWidth: 2, 
+                borderColor: '#ffffff' 
             }] 
         }, 
         options: { 
-            responsive: true,
+            responsive: true, 
+            rotation: 0,
             plugins: { 
-                legend: { display: false },
-                datalabels: {
-                    color: '#fff',
-                    font: { weight: 'bold', size: 16 },
-                    formatter: (value, ctx) => {
-                        let label = ctx.chart.data.labels[ctx.dataIndex];
-                        return label + "\n" + toFullWidth(value) + "％";
-                    },
-                    textAlign: 'center'
-                }
-            }
+                legend: { display: false }, 
+                datalabels: { 
+                    color: '#fff', 
+                    font: { weight: 'bold', size: 16 }, 
+                    formatter: (value, ctx) => ctx.chart.data.labels[ctx.dataIndex] + "\n" + toFullWidth(value) + "％", 
+                    textAlign: 'center' 
+                } 
+            } 
         } 
     });
     window.scrollTo(0,0);
