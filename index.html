@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>こども園 チーム役割診断</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
     <style>
         :root { --green-deep: #2d5a3d; --green-light: #e8f2ec; --accent: #c8763a; --text: #1a2e22; }
@@ -26,7 +27,7 @@
         .main-attribute { font-family: 'Noto Serif JP', serif; font-size: 28px; color: var(--accent); margin-bottom: 20px; }
         .description { text-align: left; background: var(--green-light); padding: 20px; border-radius: 15px; font-size: 14px; margin-bottom: 20px; }
         .evolution-box { text-align: left; border: 2px solid var(--accent); padding: 20px; border-radius: 15px; margin-top: 20px; background: #fff; font-size: 14px; }
-        .chart-container { width: 100%; max-width: 350px; margin: 30px auto; }
+        .chart-container { width: 100%; max-width: 380px; margin: 30px auto; }
     </style>
 </head>
 <body>
@@ -36,7 +37,7 @@
         <p class="intro">最も近いものを選んでください。直感で選ぶのがポイントです。</p>
         <form id="diag-form">
             <div id="questions-container"></div>
-            <button type="button" class="btn-submit" onclick="calc()">結果を見る</button>
+            <button type="button" class="btn-submit" onclick="validateAndCalc()">結果を見る</button>
         </form>
     </div>
     <div id="result-area">
@@ -58,6 +59,13 @@
 </div>
 
 <script>
+// 数字を全角にする
+function toFullWidth(str) {
+    return str.toString().replace(/[0-9]/g, function(s) {
+        return String.fromCharCode(s.charCodeAt(0) + 0xFEE0);
+    });
+}
+
 const questions = [
     { id: 1, type: "土", text: "園でずっと続けてきた行事も、「もっと子どもたちが楽しめるには？」と中身をアップデートさせるのが好き。" },
     { id: 2, type: "風", text: "素敵な取り組みを見つけたとき、そのまま持ち込むのではなく「うちの園に合う言葉や形」に変えてみんなに伝えたい。" },
@@ -79,10 +87,10 @@ const questions = [
 const container = document.getElementById('questions-container');
 questions.forEach((q, i) => {
     container.insertAdjacentHTML('beforeend', `
-        <div class="question-item">
-            <span class="question-text">${i+1}. ${q.text}</span>
+        <div class="question-item" id="q-block-${q.id}">
+            <span class="question-text">${toFullWidth(i+1)}. ${q.text}</span>
             <div class="options">
-                <label class="option-label"><input type="radio" name="q${q.id}" value="4" required><span class="radio-button">４</span>まさに自分</label>
+                <label class="option-label"><input type="radio" name="q${q.id}" value="4"><span class="radio-button">４</span>まさに自分</label>
                 <label class="option-label"><input type="radio" name="q${q.id}" value="3"><span class="radio-button">３</span>そう思う</label>
                 <label class="option-label"><input type="radio" name="q${q.id}" value="2"><span class="radio-button">２</span>あまりない</label>
                 <label class="option-label"><input type="radio" name="q${q.id}" value="1"><span class="radio-button">１</span>自分とは違う</label>
@@ -91,14 +99,31 @@ questions.forEach((q, i) => {
     `);
 });
 
-function calc() {
-    const data = new FormData(document.getElementById('diag-form'));
+// ✅ アラートを出すためのバリデーション関数
+function validateAndCalc() {
+    const form = document.getElementById('diag-form');
+    const data = new FormData(form);
+    let unanswered = [];
+
+    questions.forEach(q => {
+        if (!data.get(`q${q.id}`)) {
+            unanswered.push(toFullWidth(questions.indexOf(q) + 1));
+        }
+    });
+
+    if (unanswered.length > 0) {
+        alert("未回答の項目があります： " + unanswered.join("、 ") + " 番");
+        const firstUnanswered = questions.find(q => !data.get(`q${q.id}`));
+        document.getElementById(`q-block-${firstUnanswered.id}`).scrollIntoView({ behavior: 'smooth' });
+        return;
+    }
+    calc(data);
+}
+
+function calc(data) {
     let s = { "水": 0, "土": 0, "風": 0 };
-    questions.forEach(q => { s[q.type] += parseInt(data.get(`q${q.id}`) || 0); });
-
+    questions.forEach(q => { s[q.type] += parseInt(data.get(`q${q.id}`)); });
     const total = s["水"] + s["土"] + s["風"];
-    if (total === 0) return;
-
     const p = {
         "水": Math.round((s["水"] / total) * 100),
         "土": Math.round((s["土"] / total) * 100),
@@ -126,18 +151,20 @@ function calc() {
         "水": "<b style='color:var(--accent)'>✨ さらに進化するためのポイント</b><br>みんなの調整役に留まらず、ときには自分から「これをやってみたい！」と小さなプロジェクトのリーダーを引き受けてみませんか？『いい人』から一歩進んで、自ら実践し形にする経験を重ねることで、自分自身の自信に繋がり、チームをより力強く支えられるようになります。"
     }[m];
 
-    // 円グラフの作成
+    const sortedData = [
+        { label: "水", value: p["水"], color: '#7fb3d5' },
+        { label: "土", value: p["土"], color: '#2d5a3d' },
+        { label: "風", value: p["風"], color: '#c8763a' }
+    ].sort((a, b) => b.value - a.value);
+
+    Chart.register(ChartDataLabels);
     new Chart(document.getElementById('pieChart'), { 
         type: 'pie', 
         data: { 
-            labels: [`水 (${p["水"]}%)`, `土 (${p["土"]}%)`, `風 (${p["風"]}%)`], 
+            labels: sortedData.map(d => d.label), 
             datasets: [{ 
-                data: [p["水"], p["土"], p["風"]], 
-                backgroundColor: [
-                    '#7fb3d5', // 水：落ち着いた青
-                    '#2d5a3d', // 土：深緑
-                    '#c8763a'  // 風：アクセントカラー（オレンジ）
-                ],
+                data: sortedData.map(d => d.value), 
+                backgroundColor: sortedData.map(d => d.color),
                 borderWidth: 2,
                 borderColor: '#ffffff'
             }] 
@@ -145,11 +172,16 @@ function calc() {
         options: { 
             responsive: true,
             plugins: { 
-                legend: { 
-                    position: 'bottom',
-                    labels: { font: { size: 14, weight: 'bold' }, padding: 20 }
-                },
-                tooltip: { enabled: true }
+                legend: { display: false },
+                datalabels: {
+                    color: '#fff',
+                    font: { weight: 'bold', size: 16 },
+                    formatter: (value, ctx) => {
+                        let label = ctx.chart.data.labels[ctx.dataIndex];
+                        return label + "\n" + toFullWidth(value) + "％";
+                    },
+                    textAlign: 'center'
+                }
             }
         } 
     });
