@@ -1,150 +1,152 @@
 <!DOCTYPE html>
 <html lang="ja">
-    <head>
-        <meta charset="UTF-８">
-        <meta name="viewport" content="width=device-width, initial-scale=１.０">
-        <title>こども園 チーム役割診断</title>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <link href="https://fonts.googleapis.com/css２?family=Noto+Sans+JP:wght@４００;７００&family=Noto+Serif+JP:wght@７００&display=swap" rel="stylesheet">
-        <style>
-            :root { --green-deep: #２d５a３d; --green-light: #e８f２ec; --accent: #c８７６３a; --text: #１a２e２２; }
-            body { font-family: 'Noto Sans JP', sans-serif; background-color: #faf８f３; color: var(--text); padding: ２０px; margin: ０; line-height: １.６; }
-            .container { max-width: ６００px; margin: ０ auto; background: #fff; padding: ３０px; border-radius: ２０px; box-shadow: ０ ４px ２０px rgba(０,０,０,０.０５); }
-            h１ { font-family: 'Noto Serif JP', serif; color: var(--green-deep); text-align: center; font-size: ２４px; margin-top: ０; }
-            .intro { font-size: １４px; text-align: center; margin-bottom: ３０px; color: #６６６; background: #fdfaf０; padding: １５px; border-radius: １０px; }
-            .question-item { margin-bottom: ２５px; padding-bottom: ２０px; border-bottom: １px dashed #eee; }
-            .question-text { font-weight: bold; font-size: １５px; margin-bottom: １５px; display: block; color: var(--green-deep); }
-            .options { display: flex; justify-content: space-between; gap: ５px; }
-            .option-label { flex: １; text-align: center; font-size: １０px; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
-            .option-label input { display: none; }
-            .radio-button { display: block; width: １００%; padding: １０px ０; background: #f４f４f４; border-radius: ８px; margin-bottom: ５px; transition: ０.２s; font-weight: bold; font-size: １４px; border: １px solid #ddd; }
-            input:checked + .radio-button { background: var(--green-deep); color: #fff; border-color: var(--green-deep); }
-            .btn-submit { display: block; width: １００%; padding: １８px; background: var(--green-deep); color: #fff; border: none; border-radius: １０px; font-size: １６px; font-weight: bold; cursor: pointer; margin-top: ２０px; }
-            #result-area { display: none; text-align: center; }
-            #res-illust { width: １００%; max-width: ３００px; height: auto; margin: ２０px auto; border-radius: １５px; border: ２px solid var(--green-light); box-shadow: ０ ２px １０px rgba(０,０,０,０.０５); display: block; }
-            .res-type-main { font-family: 'Noto Serif JP', serif; font-size: ４２px; color: var(--green-deep); margin-bottom: １０px; border-bottom: ２px solid var(--green-light); display: inline-block; padding: ０ ２０px; }
-            .main-attribute { font-family: 'Noto Serif JP', serif; font-size: ２８px; color: var(--accent); margin-bottom: ２０px; }
-            .description { text-align: left; background: var(--green-light); padding: ２０px; border-radius: １５px; font-size: １４px; margin-bottom: ２０px; }
-            .evolution-box { text-align: left; border: ２px solid var(--accent); padding: ２０px; border-radius: １５px; margin-top: ２０px; background: #fff; font-size: １４px; }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div id="survey-area">
-                <h1>こども園 チーム役割診断</h1>
-                <p class="intro">最も近いものを選んでください。直感で選ぶのがポイントです。</p>
-                <form id="diag-form">
-                    <div id="questions-container"></div>
-                    <button type="button" class="btn-submit" onclick="calc()">結果を見る</button>
-                </form>
-            </div>
-            <div id="result-area">
-                <h1>診断結果</h1>
-                <img id="res-illust" src="" alt="属性イラスト">
-                <div>あなたは</div>
-                <div id="res-type" class="res-type-main"></div>
-                <div id="res-name" class="main-attribute"></div>
-                <div id="res-desc" class="description"></div>
-                <div id="res-evolution" class="evolution-box"></div>
-                
-                <p style="margin-top: ３０px; font-weight: bold; color: var(--green-deep);">【 あなたの属性バランス 】</p>
-                <canvas id="radarChart"></canvas>
-                
-                <button type="button" class="btn-submit" style="background: #６６６;" onclick="location.reload()">もう一度診断する</button>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>こども園 チーム役割診断</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root { --green-deep: #2d5a3d; --green-light: #e8f2ec; --accent: #c8763a; --text: #1a2e22; }
+        body { font-family: 'Noto Sans JP', sans-serif; background-color: #faf8f3; color: var(--text); padding: 20px; margin: 0; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        h1 { font-family: 'Noto Serif JP', serif; color: var(--green-deep); text-align: center; font-size: 24px; margin-top: 0; }
+        .intro { font-size: 14px; text-align: center; margin-bottom: 30px; color: #666; background: #fdfaf0; padding: 15px; border-radius: 10px; }
+        .question-item { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed #eee; }
+        .question-text { font-weight: bold; font-size: 15px; margin-bottom: 15px; display: block; color: var(--green-deep); }
+        .options { display: flex; justify-content: space-between; gap: 5px; }
+        .option-label { flex: 1; text-align: center; font-size: 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+        .option-label input { display: none; }
+        .radio-button { display: block; width: 100%; padding: 10px 0; background: #f4f4f4; border-radius: 8px; margin-bottom: 5px; transition: 0.2s; font-weight: bold; font-size: 14px; border: 1px solid #ddd; }
+        input:checked + .radio-button { background: var(--green-deep); color: #fff; border-color: var(--green-deep); }
+        .btn-submit { display: block; width: 100%; padding: 18px; background: var(--green-deep); color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        #result-area { display: none; text-align: center; }
+        #res-illust { width: 100%; max-width: 300px; height: auto; margin: 20px auto; border-radius: 15px; border: 2px solid var(--green-light); box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: block; }
+        .res-type-main { font-family: 'Noto Serif JP', serif; font-size: 42px; color: var(--green-deep); margin-bottom: 10px; border-bottom: 2px solid var(--green-light); display: inline-block; padding: 0 20px; }
+        .main-attribute { font-family: 'Noto Serif JP', serif; font-size: 28px; color: var(--accent); margin-bottom: 20px; }
+        .description { text-align: left; background: var(--green-light); padding: 20px; border-radius: 15px; font-size: 14px; margin-bottom: 20px; }
+        .evolution-box { text-align: left; border: 2px solid var(--accent); padding: 20px; border-radius: 15px; margin-top: 20px; background: #fff; font-size: 14px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="survey-area">
+        <h1>こども園 チーム役割診断</h1>
+        <p class="intro">最も近いものを選んでください。直感で選ぶのがポイントです。</p>
+        <form id="diag-form">
+            <div id="questions-container"></div>
+            <button type="button" class="btn-submit" onclick="calc()">結果を見る</button>
+        </form>
+    </div>
+    <div id="result-area">
+        <h1>診断結果</h1>
+        <img id="res-illust" src="" alt="属性イラスト">
+        <div>あなたは</div>
+        <div id="res-type" class="res-type-main"></div>
+        <div id="res-name" class="main-attribute"></div>
+        <div id="res-desc" class="description"></div>
+        <div id="res-evolution" class="evolution-box"></div>
+        
+        <p style="margin-top: 30px; font-weight: bold; color: var(--green-deep);">【 あなたの属性バランス 】</p>
+        <canvas id="radarChart"></canvas>
+        
+        <button type="button" class="btn-submit" style="background: #666;" onclick="location.reload()">もう一度診断する</button>
+    </div>
+</div>
+
+<script>
+const questions = [
+    { id: 1, type: "土", text: "園でずっと続けてきた行事も、「もっと子どもたちが楽しめるには？」と中身をアップデートさせるのが好き。" },
+    { id: 2, type: "風", text: "素敵な取り組みを見つけたとき、そのまま持ち込むのではなく「うちの園に合う言葉や形」に変えてみんなに伝えたい。" },
+    { id: 3, type: "水", text: "意見が分かれたとき、両方の話を聞くだけでなく「こうしたらみんなが納得して前に進めるかも」と自分の案を出してみたい。" },
+    { id: 4, type: "土", text: "毎日の掃除や準備を、ただこなすだけでなく「どうすればもっとみんなが楽にできるか」を工夫したい。" },
+    { id: 5, type: "風", text: "新しいやり方を提案する前に、まずは現場の先生たちが大切にしてきた「想い」をしっかり聴くようにしている。" },
+    { id: 6, type: "水", text: "困っている仲間を助けるときは、ただ手伝うだけでなく、その人が次から自信を持って動けるような「環境」を整えてあげたい。" },
+    { id: 7, type: "土", text: "新しいことに挑戦しようとする仲間がいたら、園のルールと照らし合わせて、安心して動けるように支えてあげたい。" },
+    { id: 8, type: "風", text: "「今のやり方を変えた方がいい」と思ったときは、反対されるのを怖がらずに、その理由を丁寧に周りへ話したい。" },
+    { id: 9, type: "水", text: "周りに合わせるだけでなく、自分が「これだ！」と信じることがあれば、自ら手を挙げて責任ある役割を引き受けたい。" },
+    { id: 10, type: "土", text: "外の新しいやり方を聞いたとき、「うちは無理」と決めつけず「うちの園ならどう取り入れられるか」をまず考えたい。" },
+    { id: 11, type: "風", text: "自分のアイデアをただの思いつきで終わらせず、本で調べたり外の人に聞いたりして、形になるまで粘り強く動きたい。" },
+    { id: 12, type: "水", text: "相談に乗るだけでなく、自分自身が現場で一番「楽しんで実践する姿」を見せることで、チームを勇気づけたい。" },
+    { id: 13, type: "土", text: "これまでの経験を活かして、新しいアイデアを形にするための「具体的な段取り」を整えるのが自分の役割だと思う。" },
+    { id: 14, type: "風", text: "「いいな！」と思ったことがその場限りにならないよう、園の「当たり前」として定着するまで見守り続けたい。" },
+    { id: 15, type: "水", text: "チームの笑顔を守るために、なあなあにするのではなく、時には「みんなの未来のために必要なこと」を優しく、誠実に伝えたい。" }
+];
+
+const container = document.getElementById('questions-container');
+questions.forEach((q, i) => {
+    container.insertAdjacentHTML('beforeend', `
+        <div class="question-item">
+            <span class="question-text">${i+1}. ${q.text}</span>
+            <div class="options">
+                <label class="option-label"><input type="radio" name="q${q.id}" value="4" required><span class="radio-button">４</span>まさに自分</label>
+                <label class="option-label"><input type="radio" name="q${q.id}" value="3"><span class="radio-button">３</span>そう思う</label>
+                <label class="option-label"><input type="radio" name="q${q.id}" value="2"><span class="radio-button">２</span>あまりない</label>
+                <label class="option-label"><input type="radio" name="q${q.id}" value="1"><span class="radio-button">１</span>自分とは違う</label>
             </div>
         </div>
-        
-        <script>
-            const questions = [
-            { id: １, type: "土", text: "園でずっと続けてきた行事も、「もっと子どもたちが楽しめるには？」と中身をアップデートさせるのが好き。" },
-            { id: ２, type: "風", text: "素敵な取り組みを見つけたとき、そのまま持ち込むのではなく「うちの園に合う言葉や形」に変えてみんなに伝えたい。" },
-            { id: ３, type: "水", text: "意見が分かれたとき、両方の話を聞くだけでなく「こうしたらみんなが納得して前に進めるかも」と自分の案を出してみたい。" },
-            { id: ４, type: "土", text: "毎日の掃除や準備を、ただこなすだけでなく「どうすればもっとみんなが楽にできるか」を工夫したい。" },
-            { id: ５, type: "風", text: "新しいやり方を提案する前に、まずは現場の先生たちが大切にしてきた「想い」をしっかり聴くようにしている。" },
-            { id: ６, type: "水", text: "困っている仲間を助けるときは、ただ手伝うだけでなく、その人が次から自信を持って動けるような「環境」を整えてあげたい。" },
-            { id: ７, type: "土", text: "新しいことに挑戦しようとする仲間がいたら、園のルールと照らし合わせて、安心して動けるように支えてあげたい。" },
-            { id: ８, type: "風", text: "「今のやり方を変えた方がいい」と思ったときは、反対されるのを怖がらずに、その理由を丁寧に周りへ話したい。" },
-            { id: ９, type: "水", text: "周りに合わせるだけでなく、自分が「これだ！」と信じることがあれば、自ら手を挙げて責任ある役割を引き受けたい。" },
-            { id: １０, type: "土", text: "外の新しいやり方を聞いたとき、「うちは無理」と決めつけず「うちの園ならどう取り入れられるか」をまず考えたい。" },
-            { id: １１, type: "風", text: "自分のアイデアをただの思いつきで終わらせず、本で調べたり外の人に聞いたりして、形になるまで粘り強く動きたい。" },
-            { id: １２, type: "水", text: "相談に乗るだけでなく、自分自身が現場で一番「楽しんで実践する姿」を見せることで、チームを勇気づけたい。" },
-            { id: １３, type: "土", text: "これまでの経験を活かして、新しいアイデアを形にするための「具体的な段取り」を整えるのが自分の役割だと思う。" },
-            { id: １４, type: "風", text: "「いいな！」と思ったことがその場限りにならないよう、園の「当たり前」として定着するまで見守り続けたい。" },
-            { id: １５, type: "水", text: "チームの笑顔を守るために、なあなあにするのではなく、時には「みんなの未来のために必要なこと」を優しく、誠実に伝えたい。" }
-            ];
-            
-            const container = document.getElementById('questions-container');
-            questions.forEach((q, i) => {
-                    container.insertAdjacentHTML('beforeend', `
-                        <div class="question-item">
-                        <span class="question-text">${i+１}. ${q.text}</span>
-                        <div class="options">
-                        <label class="option-label"><input type="radio" name="q${q.id}" value="４" required><span class="radio-button">４</span>まさに自分</label>
-                        <label class="option-label"><input type="radio" name="q${q.id}" value="３"><span class="radio-button">３</span>そう思う</label>
-                        <label class="option-label"><input type="radio" name="q${q.id}" value="２"><span class="radio-button">２</span>あまりない</label>
-                        <label class="option-label"><input type="radio" name="q${q.id}" value="１"><span class="radio-button">１</span>自分とは違う</label>
-                        </div>
-                        </div>
-                    `);
-            });
-            
-            function calc() {
-                const data = new FormData(document.getElementById('diag-form'));
-                let s = { "水": ０, "土": ０, "風": ０ };
-                questions.forEach(q => { s[q.type] += parseInt(data.get(`q${q.id}`) || ０); });
-                
-                const total = s["水"] + s["土"] + s["風"];
-                const p = {
-                    "水": Math.round((s["水"] / total) * １００),
-                    "土": Math.round((s["土"] / total) * １００),
-                    "風": Math.round((s["風"] / total) * １００)
-                };
-                
-                document.getElementById('survey-area').style.display = 'none';
-                document.getElementById('result-area').style.display = 'block';
-                
-                let m = "水"; 
-                if (s["土"] > s[m]) m = "土";
-                if (s["風"] > s[m]) m = "風";
-                
-                document.getElementById('res-illust').src = { "土": "tsuchi.jpg", "風": "kaze.jpg", "水": "mizu.jpg" }[m];
-                document.getElementById('res-type').innerText = `「${m}」`;
-                document.getElementById('res-name').innerText = { "土": "⛰️ 信頼の守護神", "風": "🌬️ 未来への挑戦者", "水": "💧 調和の翻訳家" }[m];
-                document.getElementById('res-desc').innerText = { 
-                    "土": "園の「安心」を支える大黒柱です。あなたが誠実に日々を積み重ねるからこそ、子どもも保護者も安心して身を委ねられます。", 
-                    "風": "保育に「ワクワク」を呼び込む開拓者です。あなたの好奇心が、園の環境をアップデートし、子どもたちの新しい世界を広げます。", 
-                    "水": "チームの「笑顔」を守る潤滑油です。あなたが対話を繋ぎ、空気を循環させることで、職員が互いに助け合える温かい職場になります。" 
-                }[m];
-                document.getElementById('res-evolution').innerHTML = {
-                    "土": "<b style='color:var(--accent)'>✨ さらに進化するためのポイント</b><br>時には園の外へ飛び出して、他園の視察や研究会に「一人の見学者」として参加してみませんか？外からの視点を体験することで、『新しい風を入れようとする仲間の気持ち』がより深く理解できるようになり、あなたの持つ「受け入れの器」がさらに大きく広がります。",
-                    "風": "<b style='color:var(--accent)'>✨ さらに進化するためのポイント</b><br>新しいアイデアを提案する前に、まずは園がこれまで大切に繋いできた「物語」にゆっくりと耳を傾けてみましょう。園の歴史を丸ごと尊重した上で提案をすることで、周囲の安心感が増し、みんなと一緒にワクワクする変化を導けるようになります。",
-                    "水": "<b style='color:var(--accent)'>✨ さらに進化するためのポイント</b><br>みんなの調整役に留まらず、ときには自分から「これをやってみたい！」と小さなプロジェクトのリーダーを引き受けてみませんか？『いい人』から一歩進んで、自ら実践し形にする経験を重ねることで、自分自身の自信に繋がり、チームをより力強く支えられるようになります。"
-                }[m];
-                
-                new Chart(document.getElementById('radarChart'), { 
-                        type: 'radar', 
-                        data: { 
-                            labels: [`水 (${p["水"]}%)`, `土 (${p["土"]}%)`, `風 (${p["風"]}%)`], 
-                            datasets: [{ 
-                                data: [p["水"], p["土"], p["風"]], 
-                                backgroundColor: 'rgba(２００, １１８, ５８, ０.２)', 
-                                borderColor: 'rgb(２００, １１８, ５８)',
-                            }] 
-                        }, 
-                        options: { 
-                            scales: { 
-                                r: { 
-                                    min: ０, 
-                                    max: ６０, 
-                                    ticks: { display: false },
-                                    pointLabels: { font: { size: １４, weight: 'bold' } }
-                                } 
-                            }, 
-                            plugins: { legend: { display: false } } 
-                        }
-                });
-                window.scrollTo(０,０);
-            }
-        </script>
-    </body>
+    `);
+});
+
+function calc() {
+    const data = new FormData(document.getElementById('diag-form'));
+    let s = { "水": 0, "土": 0, "風": 0 };
+    questions.forEach(q => { s[q.type] += parseInt(data.get(`q${q.id}`) || 0); });
+
+    const total = s["水"] + s["土"] + s["風"];
+    if (total === 0) return; // 全く選択されていない場合は何もしない
+
+    const p = {
+        "水": Math.round((s["水"] / total) * 100),
+        "土": Math.round((s["土"] / total) * 100),
+        "風": Math.round((s["風"] / total) * 100)
+    };
+
+    document.getElementById('survey-area').style.display = 'none';
+    document.getElementById('result-area').style.display = 'block';
+
+    let m = "水"; 
+    if (s["土"] > s[m]) m = "土";
+    if (s["風"] > s[m]) m = "風";
+
+    document.getElementById('res-illust').src = { "土": "tsuchi.jpg", "風": "kaze.jpg", "水": "mizu.jpg" }[m];
+    document.getElementById('res-type').innerText = `「${m}」`;
+    document.getElementById('res-name').innerText = { "土": "⛰️ 信頼の守護神", "風": "🌬️ 未来への挑戦者", "水": "💧 調和の翻訳家" }[m];
+    document.getElementById('res-desc').innerText = { 
+        "土": "園の「安心」を支える大黒柱です。あなたが誠実に日々を積み重ねるからこそ、子どもも保護者も安心して身を委ねられます。", 
+        "風": "保育に「ワクワク」を呼び込む開拓者です。あなたの好奇心が、園の環境をアップデートし、子どもたちの新しい世界を広げます。", 
+        "水": "チームの「笑顔」を守る潤滑油です。あなたが対話を繋ぎ、空気を循環させることで、職員が互いに助け合える温かい職場になります。" 
+    }[m];
+    document.getElementById('res-evolution').innerHTML = {
+        "土": "<b style='color:var(--accent)'>✨ さらに進化するためのポイント</b><br>時には園の外へ飛び出して、他園の視察や研究会に「一人の見学者」として参加してみませんか？外からの視点を体験することで、『新しい風を入れようとする仲間の気持ち』がより深く理解できるようになり、あなたの持つ「受け入れの器」がさらに大きく広がります。",
+        "風": "<b style='color:var(--accent)'>✨ さらに進化するためのポイント</b><br>新しいアイデアを提案する前に、まずは園がこれまで大切に繋いできた「物語」にゆっくりと耳を傾けてみましょう。園の歴史を丸ごと尊重した上で提案をすることで、周囲の安心感が増し、みんなと一緒にワクワクする変化を導けるようになります。",
+        "水": "<b style='color:var(--accent)'>✨ さらに進化するためのポイント</b><br>みんなの調整役に留まらず、ときには自分から「これをやってみたい！」と小さなプロジェクトのリーダーを引き受けてみませんか？『いい人』から一歩進んで、自ら実践し形にする経験を重ねることで、自分自身の自信に繋がり、チームをより力強く支えられるようになります。"
+    }[m];
+
+    new Chart(document.getElementById('radarChart'), { 
+        type: 'radar', 
+        data: { 
+            labels: [`水 (${p["水"]}%)`, `土 (${p["土"]}%)`, `風 (${p["風"]}%)`], 
+            datasets: [{ 
+                data: [p["水"], p["土"], p["風"]], 
+                backgroundColor: 'rgba(200, 118, 58, 0.2)', 
+                borderColor: 'rgb(200, 118, 58)',
+            }] 
+        }, 
+        options: { 
+            scales: { 
+                r: { 
+                    min: 0, 
+                    max: 60, 
+                    ticks: { display: false },
+                    pointLabels: { font: { size: 14, weight: 'bold' } }
+                } 
+            }, 
+            plugins: { legend: { display: false } } 
+        }
+    });
+    window.scrollTo(0,0);
+}
+</script>
+</body>
 </html>
